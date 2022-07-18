@@ -1,0 +1,28 @@
+---
+- name: Stop | import common tasks
+  tags:
+    - designate
+    - openstack
+  ansible.builtin.import_tasks: "common.yml"
+
+- name: Stop | stop service
+  tags:
+    - designate
+    - openstack
+  block:
+    - name: Stop | stop service
+      ansible.builtin.service:
+        name: "{{ item }}"
+        state: "stopped"
+      become: true
+      register: stop_service
+      failed_when: stop_service.failed
+      loop: "{{ os_systemd_service_name }}"
+    - name: Stop | wait until port is closed
+      ansible.builtin.wait_for:
+        host: "{{ ansible_host }}"
+        port: "{{ designate_port }}"
+        sleep: 2
+        timeout: 10
+        state: stopped
+...

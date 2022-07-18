@@ -1,0 +1,68 @@
+[DEFAULT]
+transport_url = rabbit://openstack:{{ rabbitmq_openstack_password }}@{{ keepalived_vip }}:{{ rabbitmq_tls_port }}
+
+[backend:agent:bind9]
+[backend:agent:denominator]
+[backend:agent:djbdns]
+[backend:agent:gdnsd]
+[backend:agent:knot2]
+[backend:dynect]
+[backend:infoblox]
+[coordination]
+[cors]
+[database]
+[handler:neutron_floatingip]
+[handler:nova_fixed]
+[healthcheck]
+[heartbeat_emitter]
+[keystone]
+[keystone_authtoken]
+auth_type = password
+username = {{ os_service_name }}
+password = {{ os_password }}
+project_name = service
+project_domain_name = Default
+user_domain_name = Default
+www_authenticate_uri = http://{{ keepalived_vip }}:{{ keystone_port }}
+auth_url = http://{{ keepalived_vip }}:{{ keystone_port }}
+memcached_servers = {{ keepalived_vip }}:{{ memcached_port }}
+
+[monasca:statsd]
+[network_api:neutron]
+[oslo_concurrency]
+[oslo_messaging_amqp]
+[oslo_messaging_kafka]
+[oslo_messaging_notifications]
+[oslo_messaging_rabbit]
+ssl=true
+ssl_version=TLSv1_2
+ssl_ca_file={{ rabbitmq_ca_cert }}
+
+[oslo_middleware]
+[oslo_policy]
+[producer_task:delayed_notify]
+[producer_task:periodic_exists]
+[producer_task:periodic_secondary_refresh]
+[producer_task:worker_periodic_recovery]
+[producer_task:zone_purge]
+[proxy]
+[service:agent]
+
+[service:api]
+listen = {{ keepalived_vip_svc }}:{{ designate_port }}
+api_base_uri = http://{{ keepalived_vip_svc }}:{{ designate_port }}
+auth_strategy = keystone
+enable_api_v2 = True
+enable_api_admin = True
+enable_host_header = True
+enabled_extensions_admin = quotas, reports
+
+[service:central]
+[service:mdns]
+[service:producer]
+[service:sink]
+[service:worker]
+[ssl]
+[storage:sqlalchemy]
+connection = mysql+pymysql://{{ os_service_name }}:{{ db_password }}@{{ keepalived_vip }}/{{ os_service_name }}?charset=utf8&ssl_ca={{ mariadb_ca_cert }}
+

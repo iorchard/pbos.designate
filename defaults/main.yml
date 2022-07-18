@@ -1,0 +1,19 @@
+---
+offline: false
+openstack_release: "yoga"
+keepalived_vip: ~
+os_service_name: "designate"
+db_password: "{{ designate_password }}"
+os_password: "{{ designate_password }}"
+memcached_port: 11211
+keystone_port: 5000
+designate_port: 9001
+os_endpoint_interface:
+  - { name: 'public', url: "http://{{ keepalived_vip_svc | ternary(keepalived_vip_svc, keepalived_vip) }}:{{ designate_port }}" }
+rabbitmq_tls_port: 5671
+mariadb_ca_cert: "/etc/my.cnf.d/certificates/ca-cert.pem"
+rabbitmq_ca_cert: "/etc/rabbitmq/certificates/ca-cert.pem"
+pool:
+  ns_hostname: "ns.pbos.local."
+  description: "PBOS DNS Pool"
+...

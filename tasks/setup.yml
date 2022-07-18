@@ -1,0 +1,71 @@
+---
+- name: Setup | create an RNDC key
+  ansible.builtin.command: >-
+    rndc-confgen -a -k designate -c /etc/designate/rndc.key -r /dev/urandom
+  become: true
+  changed_when: false
+
+- name: Setup | change ownership and permission of RNDC key file
+  ansible.builtin.file:
+    path: /etc/designate/rndc.key
+    owner: named
+    group: designate
+    mode: '0640'
+  become: true
+
+- name: Setup | template configuration
+  ansible.builtin.template:
+    dest: "{{ item.dest }}"
+    src: "{{ ansible_os_family | lower }}{{ item.dest + '.j2' }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+    backup: true
+  loop: "{{ os_service_conf }}"
+  become: true
+  changed_when: true
+
+- name: Setup | enable and start named service
+  ansible.builtin.service:
+    name: named
+    enabled: true
+    state: restarted
+  become: true
+
+- name: Setup | create db tables
+  ansible.builtin.command: >-
+    su -s /bin/sh -c "designate-manage database sync" {{ os_service_name }}
+  become: true
+  changed_when: false
+  delegate_to: "{{ groups['designate'][0] }}"
+  run_once: true
+
+- name: Setup | enable and start central and api services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: true
+    state: restarted
+  loop:
+    - designate-central
+    - designate-api
+  become: true
+
+- name: Setup | update the pools
+  ansible.builtin.command: >-
+    su -s /bin/sh -c "designate-manage pool update" {{ os_service_name }}
+  become: true
+  changed_when: false
+  delegate_to: "{{ groups['designate'][0] }}"
+  run_once: true
+
+- name: Setup | enable and start worker, producer, mdns services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: true
+    state: restarted
+  loop:
+    - designate-worker
+    - designate-producer
+    - designate-mdns
+  become: true
+...

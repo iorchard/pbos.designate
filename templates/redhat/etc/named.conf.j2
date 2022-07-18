@@ -1,0 +1,46 @@
+include "/etc/designate/rndc.key";
+
+options {
+    listen-on port 53 { {{ keepalived_vip_svc | ternary(keepalived_vip_svc, keepalived_vip) }}; };
+    directory       "/var/named";
+    dump-file       "/var/named/data/cache_dump.db";
+    statistics-file "/var/named/data/named_stats.txt";
+    memstatistics-file "/var/named/data/named_mem_stats.txt";
+    secroots-file   "/var/named/data/named.secroots";
+    recursing-file  "/var/named/data/named.recursing";
+    allow-new-zones yes;
+    request-ixfr no;
+    recursion no;
+    allow-query { any; };
+
+    dnssec-enable yes;
+    dnssec-validation yes;
+
+    managed-keys-directory "/var/named/dynamic";
+
+    pid-file "/run/named/named.pid";
+    session-keyfile "/run/named/session.key";
+
+    include "/etc/crypto-policies/back-ends/bind.config";
+};
+
+controls {
+  inet 127.0.0.1 port 953
+    allow { 127.0.0.1; } keys { "designate"; };
+};
+
+logging {
+  channel default_debug {
+          file "data/named.run";
+          severity dynamic;
+  };
+};
+
+zone "." IN {
+  type hint;
+  file "named.ca";
+};
+
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";
+

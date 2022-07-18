@@ -1,0 +1,39 @@
+---
+# pkg state: latest or present
+pkg_state: "latest"
+prereq_pkgs:
+  - ca-certificates
+  - curl
+
+packages:
+  - openstack-designate-agent
+  - openstack-designate-api
+  - openstack-designate-central
+  - openstack-designate-common
+  - openstack-designate-mdns
+  - openstack-designate-producer
+  - openstack-designate-sink
+  - openstack-designate-ui
+  - openstack-designate-worker
+  - bind
+  - bind-utils
+
+mariadb_service_socket: "/var/lib/mysql/mysql.sock"
+
+os_service_init: []
+
+os_conf_dir: "/etc/designate"
+
+os_service_conf:
+  - {dest: "/etc/named.conf", owner: "root", group: "named", mode: "0640"}
+  - {dest: "{{ os_conf_dir }}/designate.conf", owner: "root", group: "{{ os_service_name }}", mode: "0640"}
+  - {dest: "{{ os_conf_dir }}/pools.yaml", owner: "root", group: "{{ os_service_name }}", mode: "0640"}
+
+os_systemd_service_name:
+  - {name: "named.service", state: "restarted"}
+  - {name: "designate-central.service", state: "restarted"}
+  - {name: "designate-api.service", state: "restarted"}
+  - {name: "designate-worker.service", state: "restarted"}
+  - {name: "designate-producer.service", state: "restarted"}
+  - {name: "designate-mdns.service", state: "restarted"}
+...
