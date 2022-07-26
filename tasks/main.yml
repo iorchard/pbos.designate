@@ -16,12 +16,15 @@
       paths:
         - "."
 
-#- name: Main | include openstack tasks
-#  ansible.builtin.include_tasks: "openstack.yml"
-#
-#- name: Main | include DB tasks
-#  ansible.builtin.include_tasks: "db.yml"
-#
+- name: Main | include openstack tasks
+  ansible.builtin.include_tasks: "openstack.yml"
+
+- name: Main | include DB tasks
+  ansible.builtin.include_tasks: "db.yml"
+
 - name: Main | include setup tasks
   ansible.builtin.include_tasks: "setup.yml"
+
+- name: Main | include neutron integration tasks
+  ansible.builtin.include_tasks: "neutron.yml"
 ...

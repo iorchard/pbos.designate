@@ -16,4 +16,9 @@ rabbitmq_ca_cert: "/etc/rabbitmq/certificates/ca-cert.pem"
 pool:
   ns_hostname: "ns.pbos.local."
   description: "PBOS DNS Pool"
+dns_domain: "pbos.local."
+ptr_zone_email: "admin@pbos.local"
+neutron_password: ~
+neutron_conf: "/etc/neutron/neutron.conf"
+neutron_ml2_conf: "/etc/neutron/plugins/ml2/ml2_conf.ini"
 ...

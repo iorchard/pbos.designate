@@ -36,4 +36,7 @@ os_systemd_service_name:
   - {name: "designate-worker.service", state: "restarted"}
   - {name: "designate-producer.service", state: "restarted"}
   - {name: "designate-mdns.service", state: "restarted"}
+
+os_systemd_neutron_service:
+  - {name: "neutron-server.service", state: "restarted"}
 ...

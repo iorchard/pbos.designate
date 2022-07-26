@@ -1,0 +1,55 @@
+---
+- name: Neutron | add dns settings in neutron.conf
+  ansible.builtin.blockinfile:
+    path: "{{ neutron_conf }}"
+    insertafter: '^\[DEFAULT\]$'
+    marker: "# {mark} DNS CONFIG BLOCK"
+    block: |
+      dns_domain = {{ dns_domain }}
+      external_dns_driver = designate
+  become: true
+  notify:
+    - systemctl restart neutron service
+
+- name: Neutron | add designate section in neutron.conf
+  ansible.builtin.blockinfile:
+    path: "{{ neutron_conf }}"
+    insertafter: EOL
+    marker: "# {mark} DNS DESIGNATE BLOCK"
+    block: |
+      [designate]
+      url = http://{{ keepalived_vip_svc | ternary(keepalived_vip_svc, keepalived_vip) }}:{{ designate_port }}/v2
+      auth_type = password
+      auth_url = http://{{ keepalived_vip }}:{{ keystone_port }}
+      username = neutron
+      password = {{ neutron_password }}
+      project_name = service
+      project_domain_name = Default
+      user_domain_name = Default
+      allow_reverse_dns_lookup = True
+      ipv4_ptr_zone_prefix_size = 24
+      ipv6_ptr_zone_prefix_size = 116
+      ptr_zone_email = dnsmaster@{{ dns_domain[:-1] }}
+  become: true
+  notify:
+    - systemctl restart neutron service
+
+- name: Neutron | check dns_domain_ports extension is in ml2 ini
+  ansible.builtin.lineinfile:
+    path: "{{ neutron_ml2_conf }}"
+    regexp: '^extension_drivers.+dns_domain_ports'
+    state: absent
+  check_mode: true
+  register: result
+  become: true
+
+- name: Neutron | add dns_domain_ports extension
+  ansible.builtin.replace:
+    path: "{{ neutron_ml2_conf }}"
+    regexp: '^(extension_drivers.+)$'
+    replace: '\1,dns_domain_ports'
+  become: true
+  notify:
+    - systemctl restart neutron service
+  when: result is not changed
+...
