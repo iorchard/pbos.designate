@@ -26,6 +26,7 @@ os_conf_dir: "/etc/designate"
 
 os_service_conf:
   - {dest: "/etc/named.conf", owner: "root", group: "named", mode: "0640"}
+  - {dest: "/etc/resolv.conf", owner: "root", group: "root", mode: "0644"}
   - {dest: "{{ os_conf_dir }}/designate.conf", owner: "root", group: "{{ os_service_name }}", mode: "0640"}
   - {dest: "{{ os_conf_dir }}/pools.yaml", owner: "root", group: "{{ os_service_name }}", mode: "0640"}
 

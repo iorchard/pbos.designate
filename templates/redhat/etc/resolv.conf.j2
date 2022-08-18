@@ -1,0 +1,2 @@
+search {{ dns_domain }}
+nameserver {{ keepalived_vip_svc | ternary(keepalived_vip_svc, keepalived_vip) }}
