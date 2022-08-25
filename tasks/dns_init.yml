@@ -27,19 +27,20 @@
   delegate_to: "{{ groups['keystone'][0] }}"
   run_once: true
 
-- name: DNS Init | add NS A record in the zone
+- name: DNS Init | add custom records in the zone
   openstack.cloud.recordset:
     cloud: pbos
     state: present
     zone: "{{ dns_domain }}"
-    name: "{{ pool.ns_hostname }}"
+    name: "{{ item.name }}"
     recordset_type: "a"
-    records: ['{{ keepalived_vip_svc | ternary(keepalived_vip_svc, keepalived_vip) }}']
+    records: "{{ item.records }}"
     ttl: 86400
   delegate_to: "{{ groups['keystone'][0] }}"
   run_once: true
+  loop: "{{ custom_records }}"
 
-- name: DNS Init | add the default recordset in the zone
+- name: DNS Init | add node records in the zone
   openstack.cloud.recordset:
     cloud: pbos
     state: present

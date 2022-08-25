@@ -8,8 +8,9 @@ os_password: "{{ designate_password }}"
 memcached_port: 11211
 keystone_port: 5000
 designate_port: 9001
+vip: "{{ keepalived_vip_svc | ternary(keepalived_vip_svc, keepalived_vip) }}"
 os_endpoint_interface:
-  - { name: 'public', url: "http://{{ keepalived_vip_svc | ternary(keepalived_vip_svc, keepalived_vip) }}:{{ designate_port }}" }
+  - { name: 'public', url: "http://{{ vip }}:{{ designate_port }}" }
 rabbitmq_tls_port: 5671
 mariadb_ca_cert: "/etc/my.cnf.d/certificates/ca-cert.pem"
 rabbitmq_ca_cert: "/etc/rabbitmq/certificates/ca-cert.pem"
@@ -21,4 +22,9 @@ ptr_zone_email: "admin@pbos.local"
 neutron_password: ~
 neutron_conf: "/etc/neutron/neutron.conf"
 neutron_ml2_conf: "/etc/neutron/plugins/ml2/ml2_conf.ini"
+custom_records:
+  - {name: "{{ pool.ns_hostname }}", records: ['{{ vip }}']}
+  - {name: "openstack.{{ dns_domain }}", records: ['{{ vip }}']}
+  - {name: "db.{{ dns_domain }}", records: ['{{ vip }}']}
+  - {name: "rabbitmq.{{ dns_domain }}", records: ['{{ vip }}']}
 ...
