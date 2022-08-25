@@ -1,0 +1,54 @@
+---
+- name: DNS Init | set up the default zone
+  openstack.cloud.dns_zone:
+    cloud: pbos
+    state: present
+    name: "{{ dns_domain }}"
+    zone_type: primary
+    email: "{{ ptr_zone_email }}"
+    description: "{{ pool.description }}"
+    ttl: 86400
+    timeout: 300
+  register: _ret
+  until: _ret.failed == false
+  retries: 3
+  delay: 10
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
+
+- name: DNS Init | check zone status is active
+  openstack.cloud.dns_zone_info:
+    cloud: pbos
+    name: "{{ dns_domain }}"
+  register: _zoneinfo
+  until: _zoneinfo.zones[0].status == "ACTIVE"
+  retries: 10
+  delay: 10
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
+
+- name: DNS Init | add NS A record in the zone
+  openstack.cloud.recordset:
+    cloud: pbos
+    state: present
+    zone: "{{ dns_domain }}"
+    name: "{{ pool.ns_hostname }}"
+    recordset_type: "a"
+    records: ['{{ keepalived_vip_svc | ternary(keepalived_vip_svc, keepalived_vip) }}']
+    ttl: 86400
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
+
+- name: DNS Init | add the default recordset in the zone
+  openstack.cloud.recordset:
+    cloud: pbos
+    state: present
+    zone: "{{ dns_domain }}"
+    name: "{{ item }}.{{ dns_domain }}"
+    recordset_type: "a"
+    records: "['{{ hostvars[item].ansible_host }}']"
+    ttl: 86400
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
+  loop: "{{ groups['all'] }}"
+...

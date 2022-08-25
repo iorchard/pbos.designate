@@ -25,6 +25,10 @@
 - name: Main | include setup tasks
   ansible.builtin.include_tasks: "setup.yml"
 
-- name: Main | include neutron integration tasks
-  ansible.builtin.include_tasks: "neutron.yml"
+- name: Main | include dns init tasks
+  ansible.builtin.include_tasks: "dns_init.yml"
+
+# Hold off neutron integration for a while.
+#- name: Main | include neutron integration tasks
+#  ansible.builtin.include_tasks: "neutron.yml"
 ...
