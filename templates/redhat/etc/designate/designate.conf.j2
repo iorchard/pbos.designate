@@ -37,6 +37,8 @@ memcached_servers = {{ keepalived_vip }}:{{ memcached_port }}
 ssl=true
 ssl_version=TLSv1_2
 ssl_ca_file={{ rabbitmq_ca_cert }}
+heatbeat_in_pthread=False
+rabbit_quorum_queue=True
 
 [oslo_middleware]
 [oslo_policy]
