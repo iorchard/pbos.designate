@@ -9,12 +9,9 @@
     description: "{{ pool.description }}"
     ttl: 86400
     timeout: 300
-  register: _ret
-  until: _ret.failed == false
-  retries: 3
-  delay: 10
   delegate_to: "{{ groups['keystone'][0] }}"
   run_once: true
+  ignore_errors: true
 
 - name: DNS Init | check zone status is active
   openstack.cloud.dns_zone_info:
@@ -22,7 +19,7 @@
     name: "{{ dns_domain }}"
   register: _zoneinfo
   until: _zoneinfo.zones[0].status == "ACTIVE"
-  retries: 10
+  retries: 20
   delay: 10
   delegate_to: "{{ groups['keystone'][0] }}"
   run_once: true
