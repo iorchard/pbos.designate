@@ -18,7 +18,7 @@
     marker: "# {mark} DNS DESIGNATE BLOCK"
     block: |
       [designate]
-      url = http://{{ keepalived_vip_svc | ternary(keepalived_vip_svc, keepalived_vip) }}:{{ designate_port }}/v2
+      url = http://{{ vip }}:{{ designate_port }}/v2
       auth_type = password
       auth_url = http://{{ keepalived_vip }}:{{ keystone_port }}
       username = neutron

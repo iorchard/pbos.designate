@@ -1,7 +1,7 @@
 include "/etc/designate/rndc.key";
 
 options {
-    listen-on port 53 { {{ keepalived_vip_svc | ternary(keepalived_vip_svc, keepalived_vip) }}; };
+    listen-on port 53 { {{ vip }}; };
     directory       "/var/named";
     dump-file       "/var/named/data/cache_dump.db";
     statistics-file "/var/named/data/named_stats.txt";

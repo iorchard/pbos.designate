@@ -14,11 +14,11 @@ os_endpoint_interface:
 rabbitmq_tls_port: 5671
 mariadb_ca_cert: "/etc/my.cnf.d/certificates/ca-cert.pem"
 rabbitmq_ca_cert: "/etc/rabbitmq/certificates/ca-cert.pem"
-pool:
-  ns_hostname: "ns.pbos.local."
-  description: "PBOS DNS Pool"
 dns_domain: "pbos.local."
-ptr_zone_email: "admin@pbos.local"
+pool:
+  ns_hostname: "ns.{{ dns_domain }}"
+  description: "PBOS DNS Pool"
+  ptr_zone_email: "admin@{{ dns_domain[:-1] }}"
 neutron_password: ~
 neutron_conf: "/etc/neutron/neutron.conf"
 neutron_ml2_conf: "/etc/neutron/plugins/ml2/ml2_conf.ini"
