@@ -27,4 +27,11 @@ custom_records:
   - {name: "openstack.{{ dns_domain }}", records: ['{{ vip }}']}
   - {name: "db.{{ dns_domain }}", records: ['{{ vip }}']}
   - {name: "rabbitmq.{{ dns_domain }}", records: ['{{ vip }}']}
+# oslo messaging rabbit config
+rabbit_retry_interval: 1
+rabbit_retry_backoff: 2
+rabbit_interval_max: 30
+rabbit_quorum_queue: True
+heartbeat_timeout_threshold: 300
+heartbeat_rate: 10
 ...
