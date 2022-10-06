@@ -5,7 +5,7 @@
     state: present
     name: "{{ dns_domain }}"
     zone_type: primary
-    email: "{{ ptr_zone_email }}"
+    email: "{{ pool.ptr_zone_email }}"
     description: "{{ pool.description }}"
     ttl: 86400
     timeout: 300
@@ -20,7 +20,7 @@
   register: _zoneinfo
   until: _zoneinfo.zones[0].status == "ACTIVE"
   retries: 20
-  delay: 10
+  delay: 15
   delegate_to: "{{ groups['keystone'][0] }}"
   run_once: true
 
@@ -36,6 +36,19 @@
   delegate_to: "{{ groups['keystone'][0] }}"
   run_once: true
   loop: "{{ custom_records }}"
+
+- name: DNS Init | add redis record in the zone if redis is installed
+  openstack.cloud.recordset:
+    cloud: pbos
+    state: present
+    zone: "{{ dns_domain }}"
+    name: "redis.{{ dns_domain }}"
+    recordset_type: "a"
+    records: "{{ vip }}"
+    ttl: 86400
+  delegate_to: "{{ groups['keystone'][0] }}"
+  run_once: true
+  when: "'redis' in groups"
 
 - name: DNS Init | add node records in the zone
   openstack.cloud.recordset:
